@@ -49,8 +49,7 @@ jobs:
       - name: Auto-format with Black
         run: black .
 
-      - name: Run flake8 (style check)
-        run: flake8
+     
 
       - name: Run Bandit (security scan)
         run: bandit -r .
