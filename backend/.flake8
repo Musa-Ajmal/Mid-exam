@@ -1,0 +1,15 @@
+[flake8]
+max-line-length = 120
+ignore =
+    E501
+    F401
+    F811
+    F841
+    E231
+    E225
+    E303
+exclude =
+    venv,
+    __pycache__,
+    migrations,
+    alembic
