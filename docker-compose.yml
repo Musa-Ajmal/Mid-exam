@@ -1,0 +1,42 @@
+
+
+services:
+  # 🐍 Backend (FastAPI)
+  backend:
+    build: ./backend
+    container_name: backend
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 
+    
+    ports:
+      - "8000:8000"
+    environment:
+      - postgres://avnadmin:AVNS_b1AYuNU7LHng_BIqa0U@pizza-delivery-api-musaajmal57-6bf8.g.aivencloud.com:11389/defaultdb?sslmode=require
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  
+
+  # 🐘 PostgreSQL Database
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: avnadmin
+      POSTGRES_PASSWORD: AVNS_b1AYuNU7LHng_BIqa0U
+      POSTGRES_DB: defaultdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+# 🔗 Internal Docker network (auto handles container communication)
+networks:
+  app-network:
+    driver: bridge
+
+# 💾 Persistent volume for database
+volumes:
+  postgres_data:

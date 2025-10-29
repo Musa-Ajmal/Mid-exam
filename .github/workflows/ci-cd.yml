@@ -1,0 +1,147 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # --------------------------
+  # 1️⃣ Build & Install
+  # --------------------------
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+  # --------------------------
+  # 2️⃣ Lint / Security Scan
+  # --------------------------
+  lint:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install linters
+        run: |
+          pip install flake8 bandit
+
+      - name: Run flake8 (style check)
+        run: flake8 --max-line-length=100 .
+
+      - name: Run Bandit (security scan)
+        run: bandit -r .
+
+  # --------------------------
+  # 3️⃣ Test (with DB service)
+  # --------------------------
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: avnadmin
+          POSTGRES_PASSWORD: AVNS_b1AYuNU7LHng_BIqa0U
+          POSTGRES_DB: defaultdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://avnadmin:AVNS_b1AYuNU7LHng_BIqa0U@pizza-delivery-api-musaajmal57-6bf8.g.aivencloud.com:11389/defaultdb
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio
+
+      - name: Wait for DB
+        run: sleep 10
+
+      - name: Run tests
+        run: pytest -v
+
+  docker_build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: false   # build only, not push yet
+          tags: ${{ secrets.DOCKER_USERNAME }}/pizza-api:latest
+
+  # ========== 5️⃣ DEPLOY TO DOCKER HUB ==========
+  deploy:
+    runs-on: ubuntu-latest
+    needs: docker_build
+    if: github.ref == 'refs/heads/main'   # Only deploy on main
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push final image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/pizza-api:latest
+            ${{ secrets.DOCKER_USERNAME }}/pizza-api:${{ github.run_number }}
