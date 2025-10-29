@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from fastapi.routing import APIRoute
 from fastapi.openapi.utils import get_openapi
 
-app=FastAPI()
+app = FastAPI()
 
 
 def custom_openapi():
@@ -16,10 +16,10 @@ def custom_openapi():
         return app.openapi_schema
 
     openapi_schema = get_openapi(
-        title = "Pizza Delivery API",
-        version = "1.0",
-        description = "An API for a Pizza Delivery Service",
-        routes = app.routes,
+        title="Pizza Delivery API",
+        version="1.0",
+        description="An API for a Pizza Delivery Service",
+        routes=app.routes,
     )
 
     openapi_schema["components"]["securitySchemes"] = {
@@ -27,7 +27,7 @@ def custom_openapi():
             "type": "apiKey",
             "in": "header",
             "name": "Authorization",
-            "description": "Enter: **'Bearer &lt;JWT&gt;'**, where JWT is the access token"
+            "description": "Enter: **'Bearer &lt;JWT&gt;'**, where JWT is the access token",
         }
     }
 
@@ -36,20 +36,18 @@ def custom_openapi():
 
     for route in api_router:
         path = getattr(route, "path")
-        endpoint = getattr(route,"endpoint")
+        endpoint = getattr(route, "endpoint")
         methods = [method.lower() for method in getattr(route, "methods")]
 
         for method in methods:
             # access_token
             if (
-                re.search("jwt_required", inspect.getsource(endpoint)) or
-                re.search("fresh_jwt_required", inspect.getsource(endpoint)) or
-                re.search("jwt_optional", inspect.getsource(endpoint))
+                re.search("jwt_required", inspect.getsource(endpoint))
+                or re.search("fresh_jwt_required", inspect.getsource(endpoint))
+                or re.search("jwt_optional", inspect.getsource(endpoint))
             ):
                 openapi_schema["paths"][path][method]["security"] = [
-                    {
-                        "Bearer Auth": []
-                    }
+                    {"Bearer Auth": []}
                 ]
 
     app.openapi_schema = openapi_schema
@@ -63,7 +61,6 @@ app.openapi = custom_openapi
 def get_config():
     return Settings()
 
+
 app.include_router(auth_router)
 app.include_router(order_router)
-
-

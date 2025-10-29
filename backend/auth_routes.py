@@ -7,10 +7,7 @@ from another_fastapi_jwt_auth import AuthJWT
 from fastapi.encoders import jsonable_encoder
 
 # Router setup
-auth_router = APIRouter(
-    prefix="/auth",
-    tags=["auth"]
-)
+auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 # Create a DB session
 session = Session(bind=engine)
@@ -26,8 +23,7 @@ async def hello(Authorize: AuthJWT = Depends()):
         Authorize.jwt_required()
     except Exception:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid Token"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token"
         )
 
     return {"message": "Hello World"}
@@ -51,7 +47,7 @@ async def signup(user: SignUpModel):
     if db_email:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User with this email already exists"
+            detail="User with this email already exists",
         )
 
     # Check for existing username
@@ -59,7 +55,7 @@ async def signup(user: SignUpModel):
     if db_username:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User with this username already exists"
+            detail="User with this username already exists",
         )
 
     # Create and save new user
@@ -68,7 +64,7 @@ async def signup(user: SignUpModel):
         email=user.email,
         password=generate_password_hash(user.password),
         is_active=user.is_active,
-        is_staff=user.is_staff
+        is_staff=user.is_staff,
     )
 
     session.add(new_user)
@@ -94,16 +90,12 @@ async def login(user: LoginModel, Authorize: AuthJWT = Depends()):
         access_token = Authorize.create_access_token(subject=db_user.username)
         refresh_token = Authorize.create_refresh_token(subject=db_user.username)
 
-        response = {
-            "access": access_token,
-            "refresh": refresh_token
-        }
+        response = {"access": access_token, "refresh": refresh_token}
 
         return jsonable_encoder(response)
 
     raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail="Invalid username or password"
+        status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid username or password"
     )
 
 
@@ -119,7 +111,7 @@ async def refresh_token(Authorize: AuthJWT = Depends()):
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Please provide a valid refresh token"
+            detail="Please provide a valid refresh token",
         )
 
     current_user = Authorize.get_jwt_subject()

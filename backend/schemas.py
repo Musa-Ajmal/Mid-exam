@@ -12,15 +12,15 @@ class SignUpModel(BaseModel):
 
     model_config = ConfigDict(
         from_attributes=True,  # replaces orm_mode
-        json_schema_extra={    # replaces schema_extra
+        json_schema_extra={  # replaces schema_extra
             "example": {
                 "username": "johndoe",
                 "email": "johndoe@gmail.com",
                 "password": "password",
                 "is_staff": False,
-                "is_active": True
+                "is_active": True,
             }
-        }
+        },
     )
 
 
@@ -44,12 +44,7 @@ class OrderModel(BaseModel):
 
     model_config = ConfigDict(
         from_attributes=True,
-        json_schema_extra={
-            "example": {
-                "quantity": 2,
-                "pizza_size": "LARGE"
-            }
-        }
+        json_schema_extra={"example": {"quantity": 2, "pizza_size": "LARGE"}},
     )
 
 
@@ -57,10 +52,5 @@ class OrderStatusModel(BaseModel):
     order_status: Optional[str] = "PENDING"
 
     model_config = ConfigDict(
-        from_attributes=True,
-        json_schema_extra={
-            "example": {
-                "order_status": "PENDING"
-            }
-        }
+        from_attributes=True, json_schema_extra={"example": {"order_status": "PENDING"}}
     )
