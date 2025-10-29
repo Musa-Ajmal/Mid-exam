@@ -1,6 +1,6 @@
 from fastapi import APIRouter,Depends,status
 from fastapi.exceptions import HTTPException
-from fastapi_jwt_auth import AuthJWT
+from another_fastapi_jwt_auth import AuthJWT
 from models import User,Order
 from schemas import OrderModel,OrderStatusModel
 from database import Session , engine
