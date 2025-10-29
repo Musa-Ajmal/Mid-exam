@@ -1,0 +1,15 @@
+[flake8]
+max-line-length = 120
+ignore =
+    E501,  # line too long
+    F401,  # imported but unused
+    F811,  # redefinition of unused variable
+    F841,  # local variable assigned but never used
+    E231,  # missing whitespace after ','
+    E225,  # missing whitespace around operator
+    E303,  # too many blank lines
+exclude =
+    venv,
+    __pycache__,
+    migrations,
+    alembic
