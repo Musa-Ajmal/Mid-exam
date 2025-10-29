@@ -34,3 +34,7 @@ another_fastapi_jwt_auth==0.1.6
 # FastAPI 0.120.x is built for Pydantic v2.x and Starlette 0.48.x
 # SQLAlchemy 2.x syntax only (no deprecated 1.4 patterns)
 # psycopg-binary is psycopg v3; use "postgresql+psycopg://" in your engine URL
+
+pytest==8.4.2
+pytest-asyncio==1.2.0
+pytest-cov==7.0.0

@@ -99,7 +99,7 @@ jobs:
 
       - name: Run tests
         working-directory: ./backend
-        run: pytest -v
+        run: pytest -v --maxfail=1 --disable-warnings --tb=short
 
   # --------------------------
   # 4️⃣ Build Docker Image
