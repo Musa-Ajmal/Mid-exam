@@ -42,15 +42,17 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install linters
-        run: pip install flake8 bandit
+      - name: Install formatting and linting tools
+        run: |
+          pip install black flake8 bandit
+
+      - name: Auto-format with Black
+        run: black .
 
       - name: Run flake8 (style check)
-        working-directory: ./backend
-        run: flake8 --max-line-length=100 .
+        run: flake8
 
       - name: Run Bandit (security scan)
-        working-directory: ./backend
         run: bandit -r .
 
   # --------------------------
