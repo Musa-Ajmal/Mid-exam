@@ -6,7 +6,7 @@
 |-----------------|----------------|
 | Musa Ajmal       | FA22-BCS-147    |
 | Sheheryar Altaf  | FA22-BCS-043    |
-| Abdullah Ali     | FA22-BCS-043    |
+| Abdullah Ali     | FA22-BCS-047   |
 
 ---
 
