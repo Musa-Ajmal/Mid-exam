@@ -49,8 +49,6 @@ jobs:
       - name: Auto-format with Black
         run: black .
 
-     
-
       - name: Run Bandit (security scan)
         run: bandit -r .
 
@@ -60,6 +58,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: lint
+
     services:
       postgres:
         image: postgres:15
@@ -76,7 +75,10 @@ jobs:
           --health-retries 5
 
     env:
+      # ✅ Use Aiven DB or local test DB
       DATABASE_URL: postgresql://avnadmin:AVNS_b1AYuNU7LHng_BIqa0U@pizza-delivery-api-musaajmal57-6bf8.g.aivencloud.com:11389/defaultdb
+      PYTHONPATH: ${{ github.workspace }}  # ✅ Fix import path
+      ENVIRONMENT: test
 
     steps:
       - name: Checkout repository
@@ -94,13 +96,11 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-asyncio
 
-      - name: Wait for DB
+      - name: Wait for DB to be ready
         run: sleep 10
 
       - name: Run tests
-        working-directory: ./backend
-        run: pytest tests -v --maxfail=1 --disable-warnings --tb=short --color=yes
-
+        run: pytest backend/tests -v --maxfail=1 --disable-warnings --tb=short --color=yes
 
   # --------------------------
   # 4️⃣ Build Docker Image
