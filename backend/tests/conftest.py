@@ -31,7 +31,7 @@ def db_session():
     finally:
         session.close()
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def client(db_session):
     """Create a TestClient with a test DB session."""
 
