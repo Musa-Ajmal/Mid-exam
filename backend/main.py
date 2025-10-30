@@ -10,6 +10,9 @@ from fastapi.openapi.utils import get_openapi
 
 app = FastAPI()
 
+@app.get("/")
+def health_check():
+    return {"status": "ok"}
 
 def custom_openapi():
     if app.openapi_schema:
